@@ -48,6 +48,7 @@ export default function App(){
   
   const [result, setResult] = useState('');
   const[cards, setCards] = useState(dealCards);
+  const [gameState, setGameState] = useState('play');
 
   function compareCards(){
     const playerStats = cards.player[0].stats[0];
@@ -62,7 +63,12 @@ export default function App(){
     else{
       setResult('Loss');
     }
+    setGameState('result');
+  }
 
+  function nextRound(){
+    setGameState('play');
+    setResult('');
   }
 
   return(
@@ -71,16 +77,22 @@ export default function App(){
       <div className='game'>
         
         <ul className='card-list'>
-          {cards.player.map(playerC =>(
+          {cards.player.map((playerC,index) =>(
             <li className='card-list-item player' key={playerC.id}>
-              <Card card={playerC}/>
+              <Card card={index === 0 ? playerC : null}/>
             </li>
           ))}
         </ul>
 
         <div className='center-area'>
           <p>{result || 'Press the button'}</p>
-          <PlayButton text={'Play'} handleClick={compareCards} />
+          {
+            gameState === 'play' ?
+            (<PlayButton text={'Play'} handleClick={compareCards} />)
+            :
+            (<PlayButton text={'Next'} handleClick={nextRound} />)
+          }
+          
         </div>
 
         <ul className='card-list opponent'>
