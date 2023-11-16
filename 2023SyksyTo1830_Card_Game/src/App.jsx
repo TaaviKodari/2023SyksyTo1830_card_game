@@ -51,6 +51,15 @@ export default function App(){
   const [gameState, setGameState] = useState('play');
   const [selectedStat, setSelected] = useState(0);
 
+  if(gameState !== 'game_over' && (!cards.opponent.length  || !cards.player.length)){
+    setResult(()=>{
+      if(!cards.opponent.length) return 'Player wins!';
+      else if(!cards.player.length) return 'Player loss!';
+      return 'Draw';
+    });
+    setGameState('game_over');
+  }
+
   function compareCards(){
     const playerStats = cards.player[0].stats[selectedStat];
     const opponentStats = cards.opponent[0].stats[selectedStat];
@@ -100,6 +109,12 @@ export default function App(){
     setResult('');
   }
 
+  function restartGame(){
+    setCards(dealCards);
+    setResult('');
+    setGameState('play');
+  }
+
   return(
     <>
       <h1>Hello world!</h1>
@@ -122,15 +137,18 @@ export default function App(){
             gameState === 'play' ?
             (<PlayButton text={'Play'} handleClick={compareCards} />)
             :
+            gameState === 'game_over' ?
+            (<PlayButton text={'Restart'} handleClick={restartGame} />)
+            :
             (<PlayButton text={'Next'} handleClick={nextRound} />)
           }
           
         </div>
 
         <ul className='card-list opponent'>
-          {cards.opponent.map(opponentC =>(
+          {cards.opponent.map((opponentC, index) =>(
             <li className='card-list-item opponent' key={opponentC.id}>
-              <Card card={opponentC}/>
+              <Card card={result && index === 0 ? opponentC : null}/>
             </li>
           ))}
         </ul>
