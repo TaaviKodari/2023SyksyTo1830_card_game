@@ -1,159 +1,30 @@
-import Card from './components/Card'
-import PlayButton from './components/PlayButton';
+import React from 'react';
 import './App.css'
-import { useState } from 'react'
-
-const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min +1) + min); 
-
-const playerCard = {
-  image: "http://placekitten.com/120/100",
-  stats: [{name:'Cuteness', value: getRandomInt(1,999)},
-          {name:'Speed', value: getRandomInt(1,999)}]
-}
-
-const opponentCard = {
-  image: "http://placekitten.com/120/100?image=2",
-  stats: [{name:'Cuteness', value: 90},
-          {name:'Speed', value: 5}]
-}
-
-const createCard = index =>({
-  image: "http://placekitten.com/120/100?image=" + index,
-  stats: [{name:'Cuteness', value: getRandomInt(1,999)},
-          {name:'Speed', value: getRandomInt(1,999)},
-          {name:'Weight', value: getRandomInt(1,999)}
-        ],
-  id: crypto.randomUUID()
-})
-
-const deck = Array(16).fill(null).map((_,index)=>createCard(index));
-const half = Math.ceil(deck.length / 2);
-const dealCards = () =>{
-  shuffle(deck);
-  return{
-    player: deck.slice(0,half),
-    opponent: deck.slice(half)
-  }
-}
-
-function shuffle(array){
-  for(let i = array.length -1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
+import Home from './components/Koti';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import CardGame from './components/CardGame';
 export default function App(){
-  
-  const [result, setResult] = useState('');
-  const[cards, setCards] = useState(dealCards);
-  const [gameState, setGameState] = useState('play');
-  const [selectedStat, setSelected] = useState(0);
-
-  if(gameState !== 'game_over' && (!cards.opponent.length  || !cards.player.length)){
-    setResult(()=>{
-      if(!cards.opponent.length) return 'Player wins!';
-      else if(!cards.player.length) return 'Player loss!';
-      return 'Draw';
-    });
-    setGameState('game_over');
-  }
-
-  function compareCards(){
-    const playerStats = cards.player[0].stats[selectedStat];
-    const opponentStats = cards.opponent[0].stats[selectedStat];
-
-    if(playerStats.value === opponentStats.value){
-      setResult('Draw');
-    }
-    else if(playerStats.value > opponentStats.value){
-      setResult('Win');
-    }
-    else{
-      setResult('Loss');
-    }
-    setGameState('result');
-  }
-
-  function nextRound(){
-    setCards(cards =>{
-      const playedCards = [{...cards.player[0]}, {...cards.opponent[0]}];
-      const player = cards.player.slice(1);
-      const opponent = cards.opponent.slice(1);
-      
-      if(result === 'Draw')
-      {
-        return{
-          player,
-          opponent
-        };
-      }
-
-      if(result === 'Win'){
-        return{
-          player:[...player, ...playedCards],
-          opponent
-        };
-      }
-
-      if(result === 'Loss'){
-        return{
-          player,
-          opponent:[...opponent,...playedCards]
-        };
-      }
-      return cards;
-    });
-    setGameState('play');
-    setResult('');
-  }
-
-  function restartGame(){
-    setCards(dealCards);
-    setResult('');
-    setGameState('play');
-  }
 
   return(
-    <>
-      <h1>Hello world!</h1>
-      <div className='game'>
-        
-        <ul className='card-list'>
-          {cards.player.map((playerC,index) =>(
-            <li className='card-list-item player' key={playerC.id}>
-              <Card card={index === 0 ? playerC : null}
-              handleSelect={statIndex => gameState === 'play' && setSelected(statIndex)}
-              selectedStat={selectedStat}
-              />
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
             </li>
-          ))}
-        </ul>
-
-        <div className='center-area'>
-          <p>{result || 'Press the button'}</p>
-          {
-            gameState === 'play' ?
-            (<PlayButton text={'Play'} handleClick={compareCards} />)
-            :
-            gameState === 'game_over' ?
-            (<PlayButton text={'Restart'} handleClick={restartGame} />)
-            :
-            (<PlayButton text={'Next'} handleClick={nextRound} />)
-          }
-          
-        </div>
-
-        <ul className='card-list opponent'>
-          {cards.opponent.map((opponentC, index) =>(
-            <li className='card-list-item opponent' key={opponentC.id}>
-              <Card card={result && index === 0 ? opponentC : null}/>
+            <li>
+              <Link to="/cardgame">CardGame</Link>
             </li>
-          ))}
-        </ul>
-
+          </ul>
+        </nav>
       </div>
-    </>
+
+      <Routes>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/cardgame" element={<CardGame />} />
+      </Routes>
+
+    </Router>
   );
 }
