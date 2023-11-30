@@ -1,6 +1,5 @@
 import Card from './Card'
 import PlayButton from './PlayButton';
-import '../App.css'
 import { useState } from 'react'
 
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min +1) + min); 
