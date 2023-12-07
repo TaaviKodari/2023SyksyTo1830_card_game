@@ -1,6 +1,11 @@
 import React, {useEffect, useRef} from "react";
+import { BallMovement } from "./BallMovement";
+import data from "./data";
+import WallCollision from "./WallCollision";
 
-let x = 0;
+
+let {ballObj} = data;
+
 export default function Breakout(){
     const canvasRef = useRef(null);
     useEffect(()=>{
@@ -11,8 +16,9 @@ export default function Breakout(){
             // ctx.fillStyle = "green";
             // ctx.fillRect(10,10,150,100);
            
-            console.log("creating a circle");
-            x++;
+            BallMovement(ctx, ballObj);
+            WallCollision(ballObj,canvas);
+            
             requestAnimationFrame(render);
         }
         render();
