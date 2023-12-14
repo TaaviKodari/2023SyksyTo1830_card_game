@@ -11,6 +11,6 @@ export default {
         height: 20,
         width: 100,
         x: 100,
-        color:"orange"
+        color: "orange",
     }
 }
